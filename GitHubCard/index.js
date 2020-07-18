@@ -21,12 +21,11 @@ console.log(myGit);
 const cards = document.querySelector('.cards');
 axios.get('https://api.github.com/users/donavynhaley')
   .then((response) =>{
-    console.log(response.data);
     cards.appendChild(createCard(response.data));
-  });
- /* .catch((errorResponse) =>{
+  })
+  .catch((errorResponse) =>{
     console.log(errorResponse);
-  })*/
+  });
 /*
   STEP 5: Now that you have your own card getting added to the DOM, either
     follow this link in your browser https://api.github.com/users/<Your github name>/followers,
@@ -49,6 +48,9 @@ followersArray.forEach((person) =>{
   .then((response) =>{
     cards.appendChild(createCard(response.data));
   })
+  .catch((errorResponse) =>{
+    console.log(errorResponse);
+  });
 });
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -103,14 +105,13 @@ const createCard = (user) =>{
   
   // Adding content to elements
   img.src = user.avatar_url;
-  profileLink.href = user.url;
-  profileLink.textContent = user.url;
+  profileLink.href = user.html_url;
+  profileLink.textContent = user.html_url;
   name.textContent = user.name;
   username.textContent = user.login;
   location.textContent = `Location: ${user.location}`;
   followers.textContent = `Followers: ${user.followers}`;
   following.textContent = `Following: ${user.following}`;
-  profile.textContent = `Profile: ${profileLink}`;
   bio.textContent = `Bio: ${user.bio}`;
 
   return card;
@@ -123,3 +124,31 @@ const createCard = (user) =>{
     luishrd
     bigknell
 */
+
+/* *********** Stretch *********** */
+axios.get('https://api.github.com/users/donavynhaley')
+  .then((response) =>{
+    axios.get(response.data.followers_url)
+    .then((followersLimited) =>{
+      const listOfFollowers =[];
+      followersLimited.data.forEach((followerName)=>{
+        listOfFollowers.push(followerName.login)
+      })
+      getMultiple(listOfFollowers)
+    })
+  })
+  .catch((errorResponse) =>{
+    console.log(errorResponse);
+  });
+
+  function getMultiple(listOfNames){
+    listOfNames.forEach((person) =>{
+      axios.get(`https://api.github.com/users/${person}`)
+      .then((response) =>{
+        cards.appendChild(createCard(response.data));
+      })
+      .catch((errorResponse) =>{
+        console.log(errorResponse);
+      });
+    });
+  }
